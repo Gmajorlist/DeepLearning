@@ -10,80 +10,79 @@ import pandas as pd
 
 #데이터
 path = './_data/bike/'
-train_data = pd.read_csv(path + 'train.csv', index_col=0)
-test_data= pd.read_csv(path + 'test.csv', index_col=0)
-samplesubmission = pd.read_csv(path + 'samplesubmission.csv', index_col=0)
+train_data = pd.read_csv(path + 'train.csv', index_col = 0)         # index_col = 0 → date_t 열 데이터로 취급 X
+test_data = pd.read_csv(path + 'test.csv', index_col = 0)
+submission = pd.read_csv(path + 'sampleSubmission.csv', index_col = 0)
 
+
+train_data = pd.read_csv(path + 'train.csv', index_col = 0)         # index_col = 0 → date_t 열 데이터로 취급 X
+test_data = pd.read_csv(path + 'test.csv', index_col = 0)
+submission = pd.read_csv(path + 'sampleSubmission.csv', index_col = 0)
+
+# print(train_data.shape)          # (10886, 11)  
+# print(test_data.shape)           # (6493, 8)
+# print(train_data.columns)   
+# print(train_data.info())         # Missing Attribute Values: 결측치 - 데이터에 값이 없는 것
+# print(train_data.describe())     # 평균, 표준편차, 최대값 등
+
+# ---------------------- shape 맞추기 (열 제거) ------------------------ #
 train_data = train_data.drop(['casual', 'registered'], axis = 1)
+
+# ---------------------- x,y 분리 ------------------------ #
 x = train_data.drop(['count'], axis=1)                              # y 값(count 열) 분리, axis = 1 → 열에 대해 동작
-y = train_data['count']
+y = train_data['count']                                             # y 값(count 열)만 추출
 
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=3333)
+
+# scaler = MMS()
 scaler = SS()
-x_train = scaler.fit_transform(train_data)
-x_test = scaler.transform(test_data)
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test)
 
-
+#2. 모델구성
 model = Sequential()
-model.add(Dense(32, activation='relu', input_dim=13))
-model.add(Dropout(0.5))
-model.add(Dense(64, activation='relu'))
-model.add(Dropout(0.3))
-model.add(Dense(256, activation='relu'))
-model.add(Dropout(0.2))
+model.add(Dense(64, input_shape = (8,)))
+model.add(Dropout(0.5)) # 과적합 방지
 model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.3)) # 과적합 방지
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.2)) # 과적합 방지
+model.add(Dense(32, activation='relu'))
 model.add(Dense(1))
 
-# #2. 모델구성 
-# input = Input(shape=(13,))
-# dense1 = Dense(32)(input)
-# dense2 = Dense(64, activation= 'relu')(dense1)
-# drop1 = Dropout(0.5)(dense2)
-# dense3 = Dense(256, activation= 'relu')(drop1)
-# drop2 = Dropout(0.3)(dense3)
-# dense4 = Dense(128, activation= 'relu')(drop2)
-# drop3 = Dropout(0.2)(dense4)
-# output = Dense(1)(drop3)
+# (functional)
+# input = Input(shape=(8,))
+# dense1 = Dense(64)(input)
+# dense2 = Dense(128, activation= 'relu')(dense1)
+# dense3 = Dense(64, activation= 'relu')(dense2)
+# dense4 = Dense(32, activation= 'relu')(dense3)
+# output = Dense(1, activation= 'relu')(dense4)
 # model = Model(inputs=input, outputs=output)
 
-
+#3. 컴파일 및 훈련
 model.compile(loss = 'mse', optimizer='adam')
 
-ES = EarlyStopping(monitor='val_loss', mode='min', patience=20, 
-                   verbose = 1, restore_best_weights=False) 
-# restore_best_weights=False: default → EarlyStopping된 지점에서부터 patience만큼(가중치가 가장 좋은 지점 X)
-
-import datetime
-date = datetime.datetime.now() #현재 시간이 나옴
-print(date)
-print(type(date)) #<class 'datetime.datetime'>
-date = date.strftime("%m%d_%H%M") 
-print(date)  #0112_1503
-print(type(date)) 
-
-filepath = './_save/MCP/'
-filename = '{epoch:04d}-{val_loss:.4f}.hdf5'      
-# 04d 정수로 네 자리 받아드리겠다 #4f 소수 넷째 자리까지
-
-MCP = ModelCheckpoint(monitor='val_loss', mode = 'auto',
-                      save_best_only=True, verbose = 1, 
-                    #   filepath = path + 'keras30_ModelCheckPoint1.hdf5')
-                    filepath = filepath + 'k31_01 ' + date+ '_' + filename) 
-# ModelCheckpoint: 모델과 가중치 저장, save_best_only=True: 가장 좋은 가중치 저장
-model.fit(x_train, y_train, epochs=1024, batch_size=16, validation_split=0.2, 
-          callbacks=[ES, MCP]) 
-
-
+earlyStopping = EarlyStopping(monitor='val_loss', mode = min, patience=16, restore_best_weights=True, verbose=3) 
+hist = model.fit(x_train, y_train, epochs=256, batch_size=64, callbacks=earlyStopping, validation_split=0.2, verbose=3) #verbose: 함수 수행시 발생하는 상세한 정보들을 표준 출력으로 자세히 내보낼 것인지
 
 #4. 평가 및 예측
-print('========================= 1. 기본 출력 ===========================')
-loss = model.evaluate(x_test, y_test, verbose=3)
+loss = model.evaluate(x_test, y_test)
 print('loss: ', loss)
 
-y_predict = model.predict(x_test, verbose=3)
+y_predict = model.predict(x_test)
+# print('x_test:\n', x_test)
+# print('y_predict:\n', y_predict)
+
+# print(hist) # <keras.callbacks.History object at 0x000001ECB4986D00>
+# print(hist.history) # 딕셔너리(key, value) → loss의 변화값을 list로(value는 list로 저장된다.)  
+# print(hist.history['loss']) # key = loss인 것만 출력
+
+RMSE = np.sqrt(mean_squared_error(y_test, y_predict))
+print("RMSE: ", RMSE)
+
 r2 = r2_score(y_test, y_predict)
 print("R2: ", r2)
 
-
 y_submit = model.predict(scaler.transform(test_data))
 submission['count'] = y_submit
-samplemission.to_csv(path + 'submission_1111.csv')
+submission.to_csv(path + 'submission_0112.csv')

@@ -18,10 +18,12 @@ train_data = train_data.dropna()
 x = train_data.drop(['count'], axis=1)  # y 값(count 열) 분리, axis = 1 → 열에 대해 동작
 y = train_data['count']   
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=123)
+x_train, x_test, y_train, y_test = train_test_split(x, y, 
+                train_size=0.7, random_state=123)
 
-scaler = MMS()
-# scaler = SDS()
+
+# scaler = MMS()
+scaler = SS()
 x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
 
@@ -29,7 +31,7 @@ x_test = scaler.transform(x_test)
 model = Sequential()
 model.add(Dense(32, activation='relu', input_dim=9))
 model.add(Dropout(0.5))
-model.add(Dense(64, activation='relu'))
+model.add(Dense(64, activation='relu', input_shape=(9,)))
 model.add(Dropout(0.3))
 model.add(Dense(256, activation='relu'))
 model.add(Dropout(0.2))
@@ -52,7 +54,7 @@ model.add(Dense(1))
 model.compile(loss = 'mse', optimizer='adam')
 
 ES = EarlyStopping(monitor='val_loss', mode='min', patience=20, 
-                   verbose = 1, restore_best_weights=False) 
+                   verbose = 1, restore_best_weights=True) 
 # restore_best_weights=False: default → EarlyStopping된 지점에서부터 patience만큼(가중치가 가장 좋은 지점 X)
 
 import datetime
@@ -72,7 +74,7 @@ MCP = ModelCheckpoint(monitor='val_loss', mode = 'auto',
                     #   filepath = path + 'keras30_ModelCheckPoint1.hdf5')
                     filepath = filepath + 'k31_01 ' + date+ '_' + filename) 
 # ModelCheckpoint: 모델과 가중치 저장, save_best_only=True: 가장 좋은 가중치 저장
-model.fit(x_train, y_train, epochs=1024, batch_size=16, validation_split=0.2, 
+model.fit(x_train, y_train, epochs=1024, batch_size=22, validation_split=0.2, 
           callbacks=[ES, MCP]) 
 
 
@@ -83,8 +85,10 @@ loss = model.evaluate(x_test, y_test, verbose=3)
 print('loss: ', loss)
 
 y_predict = model.predict(x_test, verbose=3)
-r2 = r2_score(y_test, y_predict)
-print("R2: ", r2)
+def RMSE(y_test, y_predict):
+    return np.sqrt(mean_squared_error(y_test, y_predict))
+rmse = RMSE(y_test, y_predict)
+print("RMSE:", rmse)
 
 y_submit = model.predict(scaler.transform(test_data))
 submission['count'] = y_submit
