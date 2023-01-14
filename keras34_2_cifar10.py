@@ -64,3 +64,6 @@ model.fit(x_train, y_train, epochs=10,validation_data=(x_valid, y_valid) ,verbos
 results = model.evaluate(x_test, y_test)
 print('loss : ', results[0] )
 print('acc:', results[1])
+
+#loss :  1.0717706680297852
+# acc: 0.6259999871253967
