@@ -55,7 +55,7 @@ filename ='{epoch:04d}-{val_loss:.4f}.hdf5'
 mcp = ModelCheckpoint(monitor='val_loss', mode = 'auto',
                       save_best_only=True, verbose = 1,
                      filepath = filepath + 'k34_3' + '_' + filename)
-model.fit(x_train, y_train, epochs=10,validation_data=(x_valid, y_valid) ,verbose=3,
+model.fit(x_train, y_train, epochs=5, validation_data=(x_valid, y_valid) ,verbose=3,
           callbacks=[es,mcp] , batch_size=32)
 
 
