@@ -31,9 +31,9 @@ model.add(Dropout(0.25))
 model.add(Dense(64, activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2))) 
 model.add(Dropout(0.25))            
-model.add(Dense(units=32, activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2))) 
-model.add(Dropout(0.25))   
+# model.add(Dense(units=32, activation='relu'))
+# model.add(MaxPooling2D(pool_size=(2,2))) 
+# model.add(Dropout(0.25))   
 model.add(Flatten())                      
 model.add(Dense(10, activation= 'softmax'))
 
@@ -65,10 +65,5 @@ results = model.evaluate(x_test, y_test)
 print('loss : ', results[0] )
 print('acc:', results[1])
 
-
-
-
-
-
-
-     
+#loss :  1.0717706680297852
+# acc: 0.625999987125396
