@@ -16,7 +16,7 @@ print(x_test.shape, y_test.shape)# (10000, 32, 32, 3) (10000, 1)
 print(np.unique(y_train, return_counts=True)) 
 
 x_test, x_valid, y_test, y_valid = train_test_split(x_test, y_test,
-                              train_size=0.8, random_state=333)
+                              train_size=0.8, random_state=123)
 
 model = Sequential()
 model.add(Conv2D(filters=128, kernel_size=(2,2), input_shape=(32,32,3),  
@@ -24,7 +24,7 @@ model.add(Conv2D(filters=128, kernel_size=(2,2), input_shape=(32,32,3),
 model.add(Conv2D(filters=64, kernel_size=(2,2))) 
 model.add(MaxPooling2D(pool_size=(2,2))) 
 model.add(Dropout(0.25))                      
-model.add(Conv2D(filters=64, kernel_size=(2,2)))
+model.add(Conv2D(filters=86, kernel_size=(2,2)))
 model.add(MaxPooling2D(pool_size=(2,2))) 
 model.add(Dropout(0.25))                              
 model.add(Dense(64, activation='relu'))
@@ -56,7 +56,7 @@ mcp = ModelCheckpoint(monitor='val_loss', mode = 'auto',
                       save_best_only=True, verbose = 1,
                      filepath = filepath + 'k34_3' + '_' + filename)
 model.fit(x_train, y_train, epochs=5, validation_data=(x_valid, y_valid) ,verbose=3,
-          callbacks=[es,mcp] , batch_size=32)
+          callbacks=[es,mcp] , batch_size=50)
 
 
 # 평가 예측
