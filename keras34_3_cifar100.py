@@ -16,7 +16,7 @@ print(x_test.shape, y_test.shape)# (10000, 32, 32, 3) (10000, 1)
 print(np.unique(y_train, return_counts=True)) 
 
 x_test, x_valid, y_test, y_valid = train_test_split(x_test, y_test,
-                              train_size=0.8, random_state=123)
+                              train_size=0.8, random_state=333)
 
 model = Sequential()
 model.add(Conv2D(filters=32, kernel_size=(3,3), kernel_initializer='he_uniform', input_shape=(32,32,3),  
