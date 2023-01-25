@@ -1,3 +1,4 @@
+
 from tensorflow.keras.datasets import cifar100 # 칼라다
 import numpy as np
 from tensorflow.keras.datasets import mnist
@@ -10,7 +11,7 @@ from tensorflow.keras.layers import Conv2D ,Dense, Flatten, Dropout, MaxPooling2
 path = 'C:/study/keras_save/MCP/'
 (x_train, y_train), (x_test, y_test) = cifar100.load_data()
 # 데이터 확인
-print(x_train.shape, y_train.shape)#(50000, 32, 32, 3) (50000, 1)
+print(x_train.shape, y_train.shape)#(50000, 32, 32, 3) (50000, 1)               
 print(x_test.shape, y_test.shape)# (10000, 32, 32, 3) (10000, 1)
 
 print(np.unique(y_train, return_counts=True)) 
@@ -61,7 +62,7 @@ filename ='{epoch:04d}-{val_loss:.4f}.hdf5'
 mcp = ModelCheckpoint(monitor='val_loss', mode = 'auto',
                       save_best_only=True, verbose = 1,
                      filepath = filepath + 'k34_3' + '_' + filename)
-model.fit(x_train, y_train, epochs=20, validation_data=(x_valid, y_valid) ,verbose=3,
+model.fit(x_train, y_train, epochs=50, validation_data=(x_valid, y_valid) ,verbose=3,
           callbacks=[es,mcp] , batch_size=50)
 
 
@@ -71,6 +72,6 @@ print('loss : ', results[0] )
 print('acc:', results[1])
 
 
-# loss :  1.880127191543579
-#  acc: 0.5086249709129333
 
+# loss :  1.855729579925537
+# acc: 0.5268750190734863
