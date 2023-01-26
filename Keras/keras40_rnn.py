@@ -1,7 +1,6 @@
-
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense , SimpleRNN, LSTM
+from tensorflow.keras.layers import Dense , SimpleRNN
 
 
 #1.데이터
@@ -20,26 +19,37 @@ print(x.shape)  #(7, 3, 1)         //  3,1  input shape가 된다
 
 
 #모델구성
-# SimpleRNN 잘 쓰지않음                    RNN 상당히 좋은 알고리즘이다 
+
 model = Sequential()
-# model.add(SimpleRNN(10, input_shape=(3, 1)))
-model.add(LSTM(units=10, input_shape=(3, 1)))
-              # 성능과 구조가 다름  / 속도가 느리다                
-                             
+model.add(SimpleRNN(64, input_shape=(3, 1)))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(16, activation='relu'))
 model.add(Dense(8, activation='relu'))
 model.add(Dense(1))
 
-model.summary()
+# 컴파일 훈련
+model.compile(loss='mse', optimizer='adam')
+model.fit(x, y, epochs=100)
 
-#SimpleRNN
-# 10* (10 + 1 + 1 ) = 120
-# units * ( feature + bias + units ) = prams 
+#평가 예측
+loss = model.evaluate(x, y)
+print('loss :', loss)
+y_pred = np.array([8, 9, 10]).reshape(1, 3, 1)
+result=model.predict(y_pred)
+print(' [8, 9, 10 ] 의 결과 :' , result)
 
-#LSTM 
-#4*(10* (10 + 1 + 1 ) = 120
- 
- # 3개의 게이트와 tanh이 들어가서 4개  - cell state /input /forget/ output - 4개 게이트
 
-# 속도가 4배차이남 베리 느림
+
+
+
+
+
+
+
+
+
+
+
+
+
+

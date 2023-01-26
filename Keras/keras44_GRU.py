@@ -42,9 +42,9 @@ model.summary()
 
 #LSTM 
 #4*(10* (10 + 1 + 1 ) = 120
- # units * ( feature + bias + units ) = prams 
+ # 4 * units * ( feature + bias + units ) = prams 
  
  # GRU
  
-# units * ( feature + bias + units ) = prams 
+#3 * units * ( feature + 2bias + units ) = prams 
 
