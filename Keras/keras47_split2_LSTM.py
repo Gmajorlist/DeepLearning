@@ -52,3 +52,11 @@ y_predict = np.array(pre_data)
 result = model.predict(y_predict)
 
 print('prediction result:\n', result) 
+
+
+#  [[100.022675]
+#  [101.02717 ]
+#  [102.03168 ]
+#  [103.03623 ]
+#  [104.04298 ]
+#  [105.054634]
