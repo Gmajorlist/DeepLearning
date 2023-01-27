@@ -10,3 +10,17 @@ import numpy as np
 
 # 데이터
 dataset = load_boston()
+x = dataset.data                
+y = dataset.target 
+print(x.shape , y.shape) #(506, 13) (506,)
+
+x = x.reshape(-1,13,1)
+print(x.shape)
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=3333)
+
+# scaler = MMS()
+scaler = SDS()
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test)
+
