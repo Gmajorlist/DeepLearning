@@ -1,6 +1,9 @@
 import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
+
+
+# 데이터
 # 사진을 증폭도 가능 >훈련데이터에 쓰일 것 
 train_datagen = ImageDataGenerator(
     rescale=1./255, #원본 영상은 0-255의 RGB 계수로 구성되는데, 
@@ -23,7 +26,7 @@ test_datagen = ImageDataGenerator(
 
 xy_train = train_datagen.flow_from_directory(
     './_data/brain/train/', # ad = 0 / nomal = 1 
-    target_size=(200, 200), # 200에 200 하면 증폭이 됨 100에100이면 축소 지금 사진은 150 임
+    target_size=(100, 100), # 200에 200 하면 증폭이 됨 100에100이면 축소 지금 사진은 150 임
     batch_size=10,  # 10개씩 자르겠다
     class_mode='binary', # 수치
     color_mode='grayscale',
@@ -35,25 +38,40 @@ xy_train = train_datagen.flow_from_directory(
 
 xy_test = test_datagen.flow_from_directory(
     './_data/brain/test/', # ad = 0 / nomal = 1 
-    target_size=(200, 200), # 200에 200 하면 증폭이 됨 100에100이면 축소 지금 사진은 150 임
+    target_size=(100, 100), # 200에 200 하면 증폭이 됨 100에100이면 축소 지금 사진은 150 임
     batch_size=10,  # 10개씩 자르겠다
     class_mode='binary', # 수치
     color_mode='grayscale',
     shuffle=True )
 
-print(xy_train)
+# 모델
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv2D, Flatten
 
-# from sklean.datasets import load_iris
-# datasets = load_iris()
-# print(datasets)
-print(xy_train[0])
-print(xy_train[0][0])
-print(xy_train[0][0].shape) #(10, 200, 200, 1) batch_size
-# print(xy_train[0][1])
-print(xy_train[0][1].shape)
+model = Sequential()
+model.add(Conv2D(64, (2, 2), input_shape=(100, 100, 1)))
+model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(Conv2D(32, (3, 3), activation='relu'))
+model.add(Flatten())
+model.add(Dense(16, activation='relu'))
+model.add(Dense(1, activation='sigmoid'))   # softmax 쓸려면 앞에가 2 가 되어야함
 
-print(type(xy_train))  # 타입을 찍으면 데이터 형태를 봄 #<class 'keras.preprocessing.image.DirectoryIterator'>
-print(type(xy_train[0]))   #<class 'tuple'> _ 리스트랑 똑같다 
-print(type(xy_train[0][0])) # <class 'numpy.ndarray'>
-print(type(xy_train[0][1])) # <class 'numpy.ndarray'>
+# 컴파일 훈련
 
+model.compile(loss='binary_crossentropy', optimizer='adam',
+              metrics=['acc']
+              )
+hist = model.fit_generator(xy_train, steps_per_epoch=16 , epochs=100, validation_data= xy_test, 
+                    validation_steps=4, )
+
+accuracy = hist.history['acc']
+val_acc = hist.history['val_acc']
+loss = hist.history['loss']
+val_loss = hist.history['val_loss']
+
+print('loss : ', loss[-1])
+print('val_loss : ', val_loss[-1])
+print('accuracy :', accuracy[-1])
+print('val_acc : ', val_acc[-1])
+
+# 그림그려라 !!??
