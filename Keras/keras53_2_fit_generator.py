@@ -74,4 +74,4 @@ print('val_loss : ', val_loss[-1])
 print('accuracy :', accuracy[-1])
 print('val_acc : ', val_acc[-1])
 
-# 그림그려라 !!??
+
